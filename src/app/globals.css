@@ -1,0 +1,224 @@
+@import "tailwindcss";
+
+/* ─────────────────────────────────────────────────────────────
+   STATIC DESIGN TOKENS
+   Tailwind generates utilities + CSS custom properties from here.
+   ───────────────────────────────────────────────────────────── */
+@theme {
+  /* Typography */
+  --font-sans: "OpenRunde", "Open Runde", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "SF Mono", "Menlo", ui-monospace, monospace;
+
+  /* Blue */
+  --color-blue-1: #f0fbff;
+  --color-blue-2: #c2f1ff;
+  --color-blue-3: #4cd5ff;
+  --color-blue-4: #00c4ff;
+  --color-blue-a1: #00c4ff14;
+  --color-blue-a2: #00c4ff29;
+  --color-blue-a3: #00c4ff66;
+
+  /* Red */
+  --color-red-1: #fff3f0;
+  --color-red-2: #ffe2db;
+  --color-red-3: #ffd5cc;
+  --color-red-4: #ff2f00;
+  --color-red-a1: #ff2f0014;
+  --color-red-a2: #ff2f0029;
+  --color-red-a3: #ff2f0066;
+
+  /* Green */
+  --color-green-1: #effbf2;
+  --color-green-2: #c2efcd;
+  --color-green-3: #71da8b;
+  --color-green-4: #33c758;
+  --color-green-a1: #33c75814;
+  --color-green-a2: #33c75829;
+  --color-green-a3: #33c75866;
+
+  /* Amber */
+  --color-amber-1: #fff8eb;
+  --color-amber-2: #ffeac2;
+  --color-amber-3: #ffc65c;
+  --color-amber-4: #ffa600;
+  --color-amber-a1: #ffa60014;
+  --color-amber-a2: #ffa60029;
+  --color-amber-a3: #ffa60066;
+
+  /* Purple */
+  --color-purple-1: #f1f1fe;
+  --color-purple-2: #dad9fc;
+  --color-purple-3: #b5b3f9;
+  --color-purple-4: #918df6;
+  --color-purple-a1: #918df614;
+  --color-purple-a2: #918df629;
+  --color-purple-a3: #918df666;
+
+  /* Sky */
+  --color-sky-1: #ebf2ff;
+  --color-sky-2: #bed5fe;
+  --color-sky-3: #689ffd;
+  --color-sky-4: #2c78fc;
+  --color-sky-a1: #2c78fc14;
+  --color-sky-a2: #2c78fc29;
+  --color-sky-a3: #2c78fc66;
+
+  /* Yellow */
+  --color-yellow-1: #fffdeb;
+  --color-yellow-2: #fff6b3;
+  --color-yellow-3: #ffec5c;
+  --color-yellow-4: #f5d90a;
+  --color-yellow-a1: #f5d90a14;
+  --color-yellow-a2: #f5d90a29;
+  --color-yellow-a3: #f5d90a66;
+
+  /* Pink */
+  --color-pink-1: #fff0f9;
+  --color-pink-2: #ffc2e9;
+  --color-pink-3: #f075c3;
+  --color-pink-4: #d6409f;
+  --color-pink-a1: #d6409f14;
+  --color-pink-a2: #d6409f29;
+  --color-pink-a3: #d6409f66;
+
+  /* Orange */
+  --color-orange-1: #fff6f0;
+  --color-orange-2: #ffdac2;
+  --color-orange-3: #ffa366;
+  --color-orange-4: #f76808;
+  --color-orange-a1: #f7680814;
+  --color-orange-a2: #f7680829;
+  --color-orange-a3: #f7680866;
+
+  /* Shadow scale */
+  --shadow-1: 0px 1px 1px #00000014, 0px 0px 0px 1px #0000000d;
+  --shadow-2: 0px 1px 3px #00000014, 0px 0px 0px 1px #00000005;
+  --shadow-3: 0px 1px 3px #0000000f, 0px 8px 16px #0000000f, 0px 0px 0px 1px #00000005;
+  --shadow-4: 0px 3px 12px #0000000f, 0px 4px 16px #0000000f, 0px 0px 0px 1px #00000008;
+
+  /* Radius scale */
+  --radius-1: 0.125rem;
+  --radius-2: 0.25rem;
+  --radius-3: 0.375rem;
+  --radius-4: 0.5rem;
+  --radius-5: 0.75rem;
+  --radius-6: 1rem;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   SEMANTIC TOKENS (theme-switching colors)
+   Defined as CSS vars below, exposed to Tailwind here.
+   ───────────────────────────────────────────────────────────── */
+@theme inline {
+  --color-background:       var(--background);
+  --color-background-subtle: var(--background-subtle);
+  --color-bg-1:  var(--bg-1);
+  --color-bg-2:  var(--bg-2);
+  --color-bg-3:  var(--bg-3);
+  --color-bg-4:  var(--bg-4);
+  --color-bg-a1: var(--bg-a1);
+  --color-bg-a2: var(--bg-a2);
+  --color-bg-a3: var(--bg-a3);
+  --color-bg-a4: var(--bg-a4);
+  --color-fg-1:  var(--fg-1);
+  --color-fg-2:  var(--fg-2);
+  --color-fg-3:  var(--fg-3);
+  --color-fg-4:  var(--fg-4);
+  --color-fg-a1: var(--fg-a1);
+  --color-fg-a2: var(--fg-a2);
+  --color-fg-a3: var(--fg-a3);
+  --color-fg-a4: var(--fg-a4);
+  --color-gray-1: var(--gray-1);
+  --color-gray-2: var(--gray-2);
+  --color-gray-3: var(--gray-3);
+  --color-gray-4: var(--gray-4);
+  --color-gray-a1: var(--gray-a1);
+  --color-gray-a2: var(--gray-a2);
+  --color-gray-a3: var(--gray-a3);
+  --color-gray-a4: var(--gray-a4);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   LIGHT MODE (default)
+   ───────────────────────────────────────────────────────────── */
+:root {
+  --background:        #fff;
+  --background-subtle: #fafafa;
+
+  --bg-1: #fff;
+  --bg-2: #f5f5f5;
+  --bg-3: #f0f0f0;
+  --bg-4: #e8e8e8;
+
+  --fg-1: #b3b3b3;
+  --fg-2: #999;
+  --fg-3: #666;
+  --fg-4: #181925;
+
+  --bg-a1: #00000008;
+  --bg-a2: #0000000d;
+  --bg-a3: #00000014;
+  --bg-a4: #0000001f;
+
+  --fg-a1: #0000004d;
+  --fg-a2: #00000066;
+  --fg-a3: #00000099;
+  --fg-a4: #181925e0;
+
+  --gray-1: #f7f7f7;
+  --gray-2: #e0e0e0;
+  --gray-3: #ccc;
+  --gray-4: #b3b3b3;
+  --gray-a1: #00000008;
+  --gray-a2: #0000001a;
+  --gray-a3: #00000030;
+  --gray-a4: #0000004d;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   DARK MODE
+   ───────────────────────────────────────────────────────────── */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background:        #0f1014;
+    --background-subtle: #131418;
+
+    --bg-1: #0f1014;
+    --bg-2: #16171d;
+    --bg-3: #1e1f27;
+    --bg-4: #272831;
+
+    --fg-1: #3e3f52;
+    --fg-2: #5f6079;
+    --fg-3: #9a9bb0;
+    --fg-4: #e4e5f0;
+
+    --bg-a1: rgba(255, 255, 255, 0.03);
+    --bg-a2: rgba(255, 255, 255, 0.06);
+    --bg-a3: rgba(255, 255, 255, 0.10);
+    --bg-a4: rgba(255, 255, 255, 0.16);
+
+    --fg-a1: rgba(255, 255, 255, 0.20);
+    --fg-a2: rgba(255, 255, 255, 0.38);
+    --fg-a3: rgba(255, 255, 255, 0.56);
+    --fg-a4: rgba(228, 229, 240, 0.88);
+
+    --gray-1: #1b1c23;
+    --gray-2: #2b2c38;
+    --gray-3: #3d3e4e;
+    --gray-4: #5d5e72;
+    --gray-a1: rgba(255, 255, 255, 0.03);
+    --gray-a2: rgba(255, 255, 255, 0.10);
+    --gray-a3: rgba(255, 255, 255, 0.19);
+    --gray-a4: rgba(255, 255, 255, 0.30);
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   BASE
+   ───────────────────────────────────────────────────────────── */
+body {
+  background-color: var(--background);
+  color: var(--fg-3);
+  letter-spacing: -0.02em;
+}

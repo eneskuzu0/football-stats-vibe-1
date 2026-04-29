@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(cd \"c:\\\\Users\\\\eneskuzu\\\\Desktop\\\\claude_antigravity\"; Move-Item -Path \"CLAUDE.md\" -Destination \"$env:TEMP\\\\claude_antigravity_CLAUDE.md\" -Force; Remove-Item -Path \"deneme\" -Force -ErrorAction SilentlyContinue; Write-Host \"Files moved/removed\")",
+      "PowerShell(cd \"c:\\\\Users\\\\eneskuzu\\\\Desktop\\\\claude_antigravity\"; Move-Item -Path \"$env:TEMP\\\\claude_antigravity_CLAUDE.md\" -Destination \"CLAUDE.md\" -Force; Write-Host \"CLAUDE.md restored\")",
+      "PowerShell(Get-ChildItem -Path \"c:\\\\Users\\\\eneskuzu\\\\Desktop\\\\claude_antigravity\\\\src\" -File -Recurse | Where-Object { $_.Extension -in @\\('.tsx', '.ts', '.jsx', '.js', '.css'\\) })",
+      "PowerShell(New-Item -ItemType Directory -Path \"c:\\\\Users\\\\eneskuzu\\\\Desktop\\\\claude_antigravity\\\\src\\\\components\" -Force)",
+      "PowerShell(Add-Type -AssemblyName System.Windows.Forms; Add-Type -AssemblyName System.Drawing; Start-Process \"msedge\" -ArgumentList \"--headless\",\"--screenshot=C:\\\\Users\\\\eneskuzu\\\\Desktop\\\\screenshot_antigravity.png\",\"--window-size=1280,900\",\"http://localhost:3000\"; Start-Sleep -Seconds 6; Write-Host \"screenshot attempt done\")"
+    ]
+  }
+}

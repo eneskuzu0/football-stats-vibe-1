@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell($start = Get-Date; Invoke-WebRequest -Uri \"http://localhost:3000\" -UseBasicParsing -TimeoutSec 10 | Out-Null; $elapsed = \\(Get-Date\\) - $start; Write-Output \"Second request: $\\($elapsed.TotalMilliseconds\\)ms\")",
+      "PowerShell(Add-Type -AssemblyName System.Windows.Forms; Add-Type -AssemblyName System.Drawing; Start-Sleep -Milliseconds 500; $screen = [System.Windows.Forms.Screen]::PrimaryScreen.Bounds; $bmp = New-Object System.Drawing.Bitmap\\($screen.Width, $screen.Height\\); $g = [System.Drawing.Graphics]::FromImage\\($bmp\\); $g.CopyFromScreen\\($screen.Location, [System.Drawing.Point]::Empty, $screen.Size\\); $path = \"$env:TEMP\\\\antigravity_screenshot.png\"; $bmp.Save\\($path\\); $g.Dispose\\(\\); $bmp.Dispose\\(\\); Write-Output \"Saved to $path\")",
+      "Read(//c/Users/eneskuzu/AppData/Local/Temp/**)",
+      "PowerShell(Start-Process \"msedge\" -ArgumentList \"http://localhost:3000\"; Start-Sleep -Seconds 3; Add-Type -AssemblyName System.Windows.Forms; Add-Type -AssemblyName System.Drawing; $screen = [System.Windows.Forms.Screen]::PrimaryScreen.Bounds; $bmp = New-Object System.Drawing.Bitmap\\($screen.Width, $screen.Height\\); $g = [System.Drawing.Graphics]::FromImage\\($bmp\\); $g.CopyFromScreen\\($screen.Location, [System.Drawing.Point]::Empty, $screen.Size\\); $path = \"$env:TEMP\\\\antigravity_dash.png\"; $bmp.Save\\($path\\); $g.Dispose\\(\\); $bmp.Dispose\\(\\); Write-Output \"Saved to $path\")",
+      "PowerShell(Invoke-WebRequest -Uri \"http://localhost:3000\" -UseBasicParsing -TimeoutSec 10)",
+      "PowerShell($r = Invoke-WebRequest -Uri \"http://localhost:3000\" -UseBasicParsing -TimeoutSec 10 -ErrorAction SilentlyContinue; if \\($r\\) { $r.StatusCode } else { \"Server not responding\" })",
+      "PowerShell($r = Invoke-WebRequest -Uri \"http://localhost:3000/team/40?league=39&season=2025\" -UseBasicParsing -TimeoutSec 30 -ErrorAction SilentlyContinue; if \\($r\\) { $r.StatusCode } else { \"Failed\" })",
+      "PowerShell(Start-Process \"msedge\" -ArgumentList \"http://localhost:3000/team/40?league=39&season=2025\"; Start-Sleep -Seconds 4; Add-Type -AssemblyName System.Windows.Forms, System.Drawing; $s = [System.Windows.Forms.Screen]::PrimaryScreen.Bounds; $bmp = New-Object System.Drawing.Bitmap\\($s.Width, $s.Height\\); $g = [System.Drawing.Graphics]::FromImage\\($bmp\\); $g.CopyFromScreen\\($s.Location, [System.Drawing.Point]::Empty, $s.Size\\); $p = \"$env:TEMP\\\\team_page.png\"; $bmp.Save\\($p\\); $g.Dispose\\(\\); $bmp.Dispose\\(\\); Write-Output $p)",
+      "PowerShell(Start-Process \"msedge\" -ArgumentList \"http://localhost:3000\"; Start-Sleep -Seconds 3; Add-Type -AssemblyName System.Windows.Forms, System.Drawing; $s = [System.Windows.Forms.Screen]::PrimaryScreen.Bounds; $bmp = New-Object System.Drawing.Bitmap\\($s.Width, $s.Height\\); $g = [System.Drawing.Graphics]::FromImage\\($bmp\\); $g.CopyFromScreen\\($s.Location, [System.Drawing.Point]::Empty, $s.Size\\); $p = \"$env:TEMP\\\\home_final.png\"; $bmp.Save\\($p\\); $g.Dispose\\(\\); $bmp.Dispose\\(\\); Write-Output $p)"
+    ]
+  }
+}
