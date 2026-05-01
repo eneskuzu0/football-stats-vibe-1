@@ -68,22 +68,35 @@ export async function getTeamTopPlayers(
   const cached = await readCache<{ scorers: NormalizedPlayer[]; assisters: NormalizedPlayer[] }>(cacheKey);
   if (cached) return cached;
 
-  const apiResult = await apiFetch<ApiFootballPlayersResponse>("/players", {
+  const page1 = await apiFetch<ApiFootballPlayersResponse>("/players", {
     team: teamId,
     league: leagueId,
     season,
     page: 1,
   });
 
-  if (!apiResult.ok || apiResult.data.response.length === 0) {
-    if (!apiResult.ok) {
-      console.error(`[football] getTeamTopPlayers(${teamId}) failed:`, apiResult.error);
+  if (!page1.ok || page1.data.response.length === 0) {
+    if (!page1.ok) {
+      console.error(`[football] getTeamTopPlayers(${teamId}) failed:`, page1.error);
     }
     if (season > 2020) return getTeamTopPlayers(teamId, leagueId, season - 1);
     return { scorers: [], assisters: [] };
   }
 
-  const players: NormalizedPlayer[] = apiResult.data.response.map((p) => ({
+  // Fetch page 2 when squad spans beyond 25 players — ensures top scorers
+  // like Salah who appear on page 2 (API sorts by appearances, not goals) are included.
+  let rawEntries = page1.data.response;
+  if (page1.data.paging.total > 1) {
+    const page2 = await apiFetch<ApiFootballPlayersResponse>("/players", {
+      team: teamId,
+      league: leagueId,
+      season,
+      page: 2,
+    });
+    if (page2.ok) rawEntries = [...rawEntries, ...page2.data.response];
+  }
+
+  const players: NormalizedPlayer[] = rawEntries.map((p) => ({
     id: p.player.id,
     name: p.player.name,
     photo: p.player.photo,
