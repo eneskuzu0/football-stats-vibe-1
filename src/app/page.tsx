@@ -4,20 +4,13 @@ import {
   Globe,
   BarChart2,
   Activity,
-  List,
-  CalendarDays,
 } from "lucide-react";
 import { Badge } from "@/components/Badge";
-import { StatCard } from "@/components/StatCard";
-import { PerformanceChart } from "@/components/PerformanceChart";
 import { StandingsTable } from "@/components/StandingsTable";
 import { getTodayFixtures } from "@/lib/football/fixtures";
 import { getLeagueStandings } from "@/lib/football/standings";
+import { LEAGUES } from "@/lib/football/leagues";
 import type { FixtureStatusShort, NormalizedFixture } from "@/lib/football/types";
-
-// ─── League IDs (API-Football) ───────────────────────────────────────────────
-const PREMIER_LEAGUE = 39;
-const SUPER_LIG = 203;
 
 // The season year is the calendar year in which the season kicked off.
 // For European leagues that start Aug/Sep: if we're in Jan–Jul we're in the
@@ -27,17 +20,13 @@ function currentSeason(): number {
   return now.getMonth() < 7 ? now.getFullYear() - 1 : now.getFullYear();
 }
 
-// ─── Badge variant mapping ───────────────────────────────────────────────────
-function statusVariant(
-  s: FixtureStatusShort
-): "green" | "amber" | "gray" | "sky" {
+function statusVariant(s: FixtureStatusShort): "green" | "amber" | "gray" | "sky" {
   if (["1H", "2H", "ET", "P", "LIVE"].includes(s)) return "green";
   if (["HT", "BT"].includes(s)) return "amber";
   if (s === "NS" || s === "TBD") return "sky";
   return "gray";
 }
 
-// ─── Score display ───────────────────────────────────────────────────────────
 function scoreDisplay(f: NormalizedFixture): string {
   if (f.homeGoals !== null && f.awayGoals !== null) {
     return `${f.homeGoals} – ${f.awayGoals}`;
@@ -45,41 +34,28 @@ function scoreDisplay(f: NormalizedFixture): string {
   return "vs";
 }
 
-// ─── Kickoff formatter ───────────────────────────────────────────────────────
-function formatKickoff(utc: string): { date: string; time: string } {
-  const d = new Date(utc);
-  return {
-    date: d.toLocaleDateString("en-GB", {
-      weekday: "short",
-      day: "numeric",
-      month: "short",
-      timeZone: "UTC",
-    }),
-    time: d.toLocaleTimeString("en-GB", {
-      hour: "2-digit",
-      minute: "2-digit",
-      timeZone: "UTC",
-    }),
-  };
+function formatKickoff(utc: string): string {
+  return new Date(utc).toLocaleTimeString("en-GB", {
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZone: "UTC",
+  });
 }
+
+const PREMIER_LEAGUE_ID = 39;
 
 export default async function Home() {
   const season = currentSeason();
 
-  const [todayFixtures, plStandings, slStandings] = await Promise.all([
-    getTodayFixtures(PREMIER_LEAGUE),
-    getLeagueStandings(PREMIER_LEAGUE, season),
-    getLeagueStandings(SUPER_LIG, season),
+  // Fetch today's PL fixtures and all 5 leagues' standings concurrently.
+  const [todayFixtures, allStandings] = await Promise.all([
+    getTodayFixtures(PREMIER_LEAGUE_ID),
+    Promise.all(LEAGUES.map((l) => getLeagueStandings(l.id, season))),
   ]);
 
-  // Live / finished matches for the scores card
   const liveAndFinished = todayFixtures.filter((f) =>
-    ["1H", "HT", "2H", "ET", "BT", "P", "FT", "AET", "PEN", "LIVE"].includes(
-      f.statusShort
-    )
+    ["1H", "HT", "2H", "ET", "BT", "P", "FT", "AET", "PEN", "LIVE"].includes(f.statusShort)
   );
-
-  // Not-yet-started matches for the fixtures strip
   const upcoming = todayFixtures.filter((f) => f.statusShort === "NS");
 
   return (
@@ -147,12 +123,12 @@ export default async function Home() {
           </h1>
           <p className="mt-5 text-[0.9375rem] text-fg-2 leading-relaxed max-w-sm mx-auto">
             Track every match, every stat, and predict outcomes
-            with data-driven insights across 89+ leagues.
+            with data-driven insights across the top 5 European leagues.
           </p>
           <div className="mt-8 flex items-center justify-center gap-8 text-sm text-fg-2">
             {(
               [
-                { icon: Globe,     label: "89 Leagues"      },
+                { icon: Globe,     label: "5 Top Leagues"   },
                 { icon: BarChart2, label: "2,400+ Matches"  },
                 { icon: Zap,       label: "Real-time"       },
               ] as const
@@ -166,119 +142,83 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* ── Stats grid ───────────────────────────────────────── */}
+      {/* ── Today's PL Fixtures ──────────────────────────────── */}
       <section className="mx-auto w-full max-w-5xl px-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-          {/* Match Performance */}
-          <StatCard
-            icon={BarChart2}
-            label="Match Performance"
-            value="7.4"
-            sub="avg rating · last 8 matches"
-            change={{ label: "↑ +0.3 vs prev", positive: true }}
-          >
-            <PerformanceChart />
-          </StatCard>
-
-          {/* Today's PL Scores */}
-          <div className="bg-bg-1 rounded-6 shadow-2 p-5 flex flex-col gap-3">
-            <div className="flex items-center gap-1.5">
-              <Activity size={13} className="text-fg-2" />
-              <span className="text-fg-2 text-xs font-medium">
-                Premier League · Today
-              </span>
-              <div className="ml-auto">
-                <Badge variant="sky">{season}/{String(season + 1).slice(2)}</Badge>
-              </div>
+        <div className="bg-bg-1 rounded-6 shadow-2 p-5 flex flex-col gap-3">
+          <div className="flex items-center gap-1.5">
+            <Activity size={13} className="text-fg-2" />
+            <span className="text-fg-2 text-xs font-medium">
+              Premier League · Today
+            </span>
+            <div className="ml-auto">
+              <Badge variant="sky">{season}/{String(season + 1).slice(2)}</Badge>
             </div>
-
-            {liveAndFinished.length > 0 ? (
-              <div className="flex flex-col divide-y divide-gray-a2">
-                {liveAndFinished.map((f) => (
-                  <div
-                    key={f.id}
-                    className="flex items-center justify-between py-3 first:pt-1"
-                  >
-                    <div className="flex items-center gap-1.5 min-w-0 text-sm">
-                      <span className="text-fg-4 font-medium truncate">
-                        {f.homeTeam}
-                      </span>
-                      <span className="text-fg-1 text-xs">vs</span>
-                      <span className="text-fg-4 font-medium truncate">
-                        {f.awayTeam}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2 shrink-0 ml-3">
-                      <span className="text-fg-4 text-sm font-semibold tabular-nums">
-                        {scoreDisplay(f)}
-                      </span>
-                      <Badge variant={statusVariant(f.statusShort)}>
-                        {f.statusDisplay}
-                      </Badge>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : upcoming.length > 0 ? (
-              <div className="flex flex-col divide-y divide-gray-a2">
-                {upcoming.slice(0, 4).map((f) => {
-                  const { time } = formatKickoff(f.kickoffUtc);
-                  return (
-                    <div
-                      key={f.id}
-                      className="flex items-center justify-between py-3 first:pt-1"
-                    >
-                      <div className="flex items-center gap-1.5 min-w-0 text-sm">
-                        <span className="text-fg-4 font-medium truncate">
-                          {f.homeTeam}
-                        </span>
-                        <span className="text-fg-1 text-xs">vs</span>
-                        <span className="text-fg-4 font-medium truncate">
-                          {f.awayTeam}
-                        </span>
-                      </div>
-                      <Badge variant="sky">{time}</Badge>
-                    </div>
-                  );
-                })}
-              </div>
-            ) : (
-              <p className="text-fg-2 text-xs py-4 text-center">
-                No Premier League fixtures today.
-              </p>
-            )}
           </div>
+
+          {liveAndFinished.length > 0 ? (
+            <div className="flex flex-col divide-y divide-gray-a2">
+              {liveAndFinished.map((f) => (
+                <div
+                  key={f.id}
+                  className="flex items-center justify-between py-3 first:pt-1"
+                >
+                  <div className="flex items-center gap-1.5 min-w-0 text-sm">
+                    <span className="text-fg-4 font-medium truncate">{f.homeTeam}</span>
+                    <span className="text-fg-1 text-xs">vs</span>
+                    <span className="text-fg-4 font-medium truncate">{f.awayTeam}</span>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0 ml-3">
+                    <span className="text-fg-4 text-sm font-semibold tabular-nums">
+                      {scoreDisplay(f)}
+                    </span>
+                    <Badge variant={statusVariant(f.statusShort)}>
+                      {f.statusDisplay}
+                    </Badge>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : upcoming.length > 0 ? (
+            <div className="flex flex-col divide-y divide-gray-a2">
+              {upcoming.slice(0, 5).map((f) => (
+                <div
+                  key={f.id}
+                  className="flex items-center justify-between py-3 first:pt-1"
+                >
+                  <div className="flex items-center gap-1.5 min-w-0 text-sm">
+                    <span className="text-fg-4 font-medium truncate">{f.homeTeam}</span>
+                    <span className="text-fg-1 text-xs">vs</span>
+                    <span className="text-fg-4 font-medium truncate">{f.awayTeam}</span>
+                  </div>
+                  <Badge variant="sky">{formatKickoff(f.kickoffUtc)}</Badge>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-fg-2 text-xs py-4 text-center">
+              No Premier League fixtures today.
+            </p>
+          )}
         </div>
       </section>
 
-      {/* ── Standings grid ───────────────────────────────────── */}
+      {/* ── Top 5 Leagues Standings ──────────────────────────── */}
       <section className="mx-auto w-full max-w-5xl px-6 mt-4 pb-20">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-          {/* Premier League */}
-          <StandingsTable
-            icon={<List size={13} className="text-fg-2" />}
-            label="Premier League"
-            badge={<Badge variant="sky">PL</Badge>}
-            rows={plStandings}
-            leagueId={PREMIER_LEAGUE}
-            season={season}
-          />
-
-          {/* Süper Lig */}
-          <StandingsTable
-            icon={<CalendarDays size={13} className="text-fg-2" />}
-            label="Süper Lig"
-            badge={<Badge variant="amber">SL</Badge>}
-            rows={slStandings}
-            leagueId={SUPER_LIG}
-            season={season}
-          />
-
+          {LEAGUES.map((league, i) => (
+            <StandingsTable
+              key={league.id}
+              icon={<BarChart2 size={13} className="text-fg-2" />}
+              label={league.name}
+              badge={<Badge variant={league.variant}>{league.badge}</Badge>}
+              rows={allStandings[i] ?? []}
+              leagueId={league.id}
+              season={season}
+            />
+          ))}
         </div>
       </section>
+
     </div>
   );
 }
-
