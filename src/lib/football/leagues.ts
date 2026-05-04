@@ -8,6 +8,7 @@ export const LEAGUES = [
   { id: 135, name: "Serie A",        country: "Italy",   badge: "SA", variant: "blue"   },
   { id: 78,  name: "Bundesliga",     country: "Germany", badge: "BL", variant: "amber"  },
   { id: 61,  name: "Ligue 1",        country: "France",  badge: "L1", variant: "purple" },
+  { id: 203, name: "Süper Lig",      country: "Turkey",  badge: "SL", variant: "green"  },
 ] as const;
 
 export type League = (typeof LEAGUES)[number];

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getLeagueStandings } from "@/lib/football/standings";
+import { getLeagueFixtures } from "@/lib/football/fixtures";
 import { LEAGUES } from "@/lib/football/leagues";
 
 // Vercel cron jobs call this route via GET.
@@ -23,23 +24,38 @@ export async function GET(request: Request) {
   const season = currentSeason();
   const started = Date.now();
 
-  // Fetch all leagues concurrently — getLeagueStandings handles caching +
-  // season fallback internally, so this either returns cached data or
-  // hits API-Football and re-populates Supabase.
-  const results = await Promise.allSettled(
-    LEAGUES.map((league) =>
-      getLeagueStandings(league.id, season).then((rows) => ({
-        leagueId: league.id,
-        name: league.name,
-        teams: rows.length,
-      }))
-    )
-  );
+  const [standingsResults, fixturesResults] = await Promise.all([
+    Promise.allSettled(
+      LEAGUES.map((league) =>
+        getLeagueStandings(league.id, season).then((rows) => ({
+          leagueId: league.id,
+          name: league.name,
+          teams: rows.length,
+        }))
+      )
+    ),
+    Promise.allSettled(
+      LEAGUES.map((league) =>
+        getLeagueFixtures(league.id, season).then((fixtures) => ({
+          leagueId: league.id,
+          name: league.name,
+          fixtures: fixtures.length,
+        }))
+      )
+    ),
+  ]);
 
-  const synced = results.map((r, i) =>
+  const standings = standingsResults.map((r, i) =>
     r.status === "fulfilled"
       ? { ...r.value, ok: true }
       : { leagueId: LEAGUES[i].id, name: LEAGUES[i].name, teams: 0, ok: false,
+          error: r.reason instanceof Error ? r.reason.message : String(r.reason) }
+  );
+
+  const fixtures = fixturesResults.map((r, i) =>
+    r.status === "fulfilled"
+      ? { ...r.value, ok: true }
+      : { leagueId: LEAGUES[i].id, name: LEAGUES[i].name, fixtures: 0, ok: false,
           error: r.reason instanceof Error ? r.reason.message : String(r.reason) }
   );
 
@@ -47,6 +63,7 @@ export async function GET(request: Request) {
     timestamp: new Date().toISOString(),
     season,
     elapsedMs: Date.now() - started,
-    synced,
+    standings,
+    fixtures,
   });
 }

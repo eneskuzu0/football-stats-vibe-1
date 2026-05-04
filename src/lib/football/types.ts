@@ -167,3 +167,70 @@ export interface NormalizedRecentFixture {
   result: "W" | "D" | "L";
   date: string;
 }
+
+// ─── Match detail ─────────────────────────────────────────────────────────────
+
+export interface ApiFootballFixtureDetailItem {
+  fixture: {
+    id: number;
+    date: string;
+    status: { short: FixtureStatusShort; elapsed: number | null };
+  };
+  league: { id: number; name: string; round: string };
+  teams: {
+    home: { id: number; name: string; logo: string; winner: boolean | null };
+    away: { id: number; name: string; logo: string; winner: boolean | null };
+  };
+  goals: { home: number | null; away: number | null };
+  score: {
+    halftime: { home: number | null; away: number | null };
+    fulltime: { home: number | null; away: number | null };
+  };
+  events: Array<{
+    time: { elapsed: number; extra: number | null };
+    team: { id: number; name: string };
+    player: { id: number; name: string };
+    type: "Goal" | "Card" | "subst" | "Var";
+    detail: string;
+  }> | null;
+}
+
+export interface ApiFootballFixtureDetailResponse {
+  response: ApiFootballFixtureDetailItem[];
+}
+
+export interface ApiFootballMatchStatsResponse {
+  response: Array<{
+    team: { id: number; name: string };
+    statistics: Array<{ type: string; value: string | number | null }>;
+  }>;
+}
+
+export interface NormalizedMatchEvent {
+  minute: number;
+  extra: number | null;
+  teamId: number;
+  teamName: string;
+  playerName: string;
+  type: "Goal" | "Card" | "subst" | "Var";
+  detail: string;
+}
+
+export interface NormalizedMatchDetail {
+  fixtureId: number;
+  date: string;
+  status: FixtureStatusShort;
+  statusDisplay: string;
+  leagueName: string;
+  leagueId: number;
+  round: string;
+  homeTeam: { id: number; name: string; goals: number | null; winner: boolean | null };
+  awayTeam: { id: number; name: string; goals: number | null; winner: boolean | null };
+  halfTime: { home: number | null; away: number | null };
+  events: NormalizedMatchEvent[];
+}
+
+export interface NormalizedMatchStats {
+  home: { id: number; name: string; stats: Record<string, string | number | null> };
+  away: { id: number; name: string; stats: Record<string, string | number | null> };
+}

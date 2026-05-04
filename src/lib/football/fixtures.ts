@@ -12,7 +12,7 @@ function todayUtc(): string {
   return new Date().toISOString().slice(0, 10);
 }
 
-function buildStatusDisplay(
+export function buildStatusDisplay(
   statusShort: FixtureStatusShort,
   elapsed: number | null,
   kickoffUtc: string
@@ -81,5 +81,50 @@ export async function getTodayFixtures(
 
   const normalized = result.data.response.map(normalize);
   await writeCache(cacheKey, normalized, TTL_FIXTURES_MINUTES);
+  return normalized;
+}
+
+const TTL_LEAGUE_FIXTURES_MINUTES = 60;
+
+/**
+ * Returns the current round's upcoming fixtures for a league.
+ * Falls back to the last 5 played fixtures when the season has no upcoming matches.
+ * Cache TTL: 60 minutes.
+ */
+export async function getLeagueFixtures(
+  leagueId: number,
+  season: number
+): Promise<NormalizedFixture[]> {
+  const cacheKey = `leaguefixtures:${leagueId}:${season}`;
+  const cached = await readCache<NormalizedFixture[]>(cacheKey);
+  if (cached) return cached;
+
+  // Try upcoming fixtures first
+  const upcoming = await apiFetch<ApiFootballFixturesResponse>("/fixtures", {
+    league: leagueId,
+    season,
+    next: 10,
+  });
+
+  if (upcoming.ok && upcoming.data.response.length > 0) {
+    const normalized = upcoming.data.response.map(normalize);
+    await writeCache(cacheKey, normalized, TTL_LEAGUE_FIXTURES_MINUTES);
+    return normalized;
+  }
+
+  // Season complete — return most recent played matches
+  const recent = await apiFetch<ApiFootballFixturesResponse>("/fixtures", {
+    league: leagueId,
+    season,
+    last: 6,
+  });
+
+  if (!recent.ok) {
+    console.error(`[football] getLeagueFixtures(${leagueId}) failed:`, recent.error);
+    return [];
+  }
+
+  const normalized = [...recent.data.response].reverse().map(normalize);
+  await writeCache(cacheKey, normalized, TTL_LEAGUE_FIXTURES_MINUTES);
   return normalized;
 }
