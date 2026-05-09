@@ -13,7 +13,8 @@
       "Bash(node -e \"require\\('framer-motion'\\)\")",
       "Bash(npm install *)",
       "Bash(node -e \"const {motion} = require\\('framer-motion'\\); console.log\\('framer-motion OK'\\)\")",
-      "Bash(npm run *)"
+      "Bash(npm run *)",
+      "Bash(xargs cat *)"
     ],
     "additionalDirectories": [
       "c:\\Users\\eneskuzu\\Desktop\\claude_antigravity\\src\\app\\match"
